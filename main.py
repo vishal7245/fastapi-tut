@@ -4,6 +4,10 @@ import sqlite3
 from typing import List
 from contextlib import asynccontextmanager
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class BugReport(BaseModel):
     title: str
@@ -36,11 +40,14 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+
+BEARER_TOKEN = os.getenv("BEARER_TOKEN")
+
 # Function to verify the Bearer Token
 def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
     token = credentials.credentials
     # Replace 'mysecrettoken' with your actual token or validation logic
-    if token != "mysecrettoken":
+    if token != BEARER_TOKEN:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or missing token",
